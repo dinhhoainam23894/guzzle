@@ -29,7 +29,7 @@ Khởi tạo client chấp nhận một tập hợp các mảng thuộc tính:
 `base_uri`
 : 
 
-(string|UriInterface) URI cơ bản của client được kết hợp trong các URI quan hệ. Có thể là một chuỗi hoặc một thực thể trong UriInterface.Khi một URI quan hệ được khởi tạo từ một client,client sẽ biên dịch URI cơ bản với URI quan hệ sử dụng các quy tắc được miêu tả trong [RFC 3986, section 2][2].
+(string|UriInterface) URI gốc của client được nối với các URI tương đối. Có thể là một chuỗi hoặc một thực thể trong UriInterface.Khi một URI tương đối được khởi tạo từ một client,client sẽ kết hợp URI gốc với URI tương đối sử dụng các quy tắc được miêu tả trong [RFC 3986, section 2][2].
     
     
     // Khởi tạo một client với URI cơ bản
@@ -80,7 +80,7 @@ Bạn có thể khởi tạo 1 request và sau đó gửi request đó với cli
     $response = $client->send($request, ['timeout' => 2]);
     
 
-Các đối tượng phía client cung cấp một deal linh hoạt trong việc request được chuyển đổi bao gồm các thuộc tính request mặc định ra sao , bộ xử lý ngăn xếp mặc định được sử dụng bởi từng request , và một URI cơ bản cho phép bạn gửi các request với các URI quan hệ.
+Các đối tượng phía client cung cấp một phương pháp linh hoạt trong việc request được vận chuyển bao gồm các thuộc tính request mặc định ra sao , bộ xử lý ngăn xếp mặc định được sử dụng bởi từng request , và một URI cơ bản cho phép bạn gửi các request với các URI tương đối.
 
 Bạn có thẻ tìm thấy nhiều tài liệu vè middleware client trong tài liệu của trang [_Handlers and Middleware_][3].
 
@@ -195,7 +195,7 @@ Bạn có thể sử dụng đối tượng `GuzzleHttpPool` khi bạn có một
     $promise->wait();
     
 
-Hoặc sử dụng closure sẽ trả về một promise khi cái pool gọi closure.
+Hoặc sử dụng closure sẽ trả về một promise khi pool gọi closure.
     
     
     $client = new Client();
@@ -214,7 +214,7 @@ Hoặc sử dụng closure sẽ trả về một promise khi cái pool gọi clo
 
 ## Sử dụng các response
 
-Trong các ví dụ trước , chúng ta đã lấy một biến `$response` hoặc chúng ta đã lấy được một response từ một promise. Đối tượng response bổ sung một chuẩn response PSR-7,`PsrHttpMessageResponseInterface`,và chứa một vài thông tin hữu dụng.
+Trong các ví dụ trước , chúng ta đã lấy một biến `$response` hoặc chúng ta đã lấy được một response từ một promise. Đối tượng response tuân theo chuẩn response PSR-7,`PsrHttpMessageResponseInterface`,và chứa một vài thông tin hữu dụng.
 
 Bạn có thể lấy mã trạng thái và  cụm từ kết luận của response:
     
@@ -254,9 +254,9 @@ Phần thân của một response có thể được lấy khi sử dụng phư�
     $remainingBytes = $body->getContents();
     
 
-## Chuỗi các tham số truy vấn
+## Tham số trong chuỗi query
 
-Bạn có thể cung cấp các chuỗi tham số truy vấn với một request theo nhiều cách.
+Bạn có thể cung cấp các tham số trong chuỗi query với một request theo nhiều cách.
 
 Bạn có thể đặt nhiều chuỗi tham số truy vấn trong các request URI:
     
@@ -361,7 +361,6 @@ Bạn có thể gửi các file cùng với một form  (`multipart/form-data` P
 
 ## Cookies
 
-Guzzle can maintain a cookie session for you if instructed using the `cookies` request option. When sending a request, the `cookies` option must be set to an instance of `GuzzleHttpCookieCookieJarInterface`.
 Guzzle có thể duy trì một phiên cookie dành cho bạn nếu được hướng dẫn sử dụng tùy chọn request `cookie`. Khi gửi request, tùy chọn `cookie` phải được đặt thành một thể hiện của `GuzzleHttpCookieCookieJarInterface`.
     
     
@@ -423,8 +422,8 @@ Guzzle ném ngoại lệ cho các lỗi xảy ra trong quá trình chuyển.
     }
     
 
-* Một ngoại lệ GuzzleHttpExceptionConnectException được ném trong trường hợp có lỗi mạng. Ngoại lệ này kéo dài từ GuzzleHttpExceptionRequestException.
-* Một GuzzleHttpExceptionClientException được ném cho 400 lỗi cấp nếu tùy chọn yêu cầu http_errors được đặt thành true. Ngoại lệ này kéo dài từ GuzzleHttpExceptionBadResponseException và GuzzleHttpExceptionBadResponseException kéo dài từ GuzzleHttpExceptionRequestException.
+* Một ngoại lệ GuzzleHttpExceptionConnectException được ném trong trường hợp có lỗi mạng. Ngoại lệ này kế thừa (extends) từ GuzzleHttpExceptionRequestException.
+* Một GuzzleHttpExceptionClientException được ném cho 400 lỗi cấp nếu tùy chọn yêu cầu http_errors được đặt thành true. Ngoại lệ này kế thừa (extends) từ GuzzleHttpExceptionBadResponseException và GuzzleHttpExceptionBadResponseException kéo dài từ GuzzleHttpExceptionRequestException.
     
         use GuzzleHttpExceptionClientException;
     
@@ -436,8 +435,8 @@ Guzzle ném ngoại lệ cho các lỗi xảy ra trong quá trình chuyển.
     }
     
 
-* Một GuzzleHttpExceptionServerException được ném cho 500 lỗi cấp nếu tùy chọn yêu cầu http_errors được đặt thành true. Ngoại lệ này kéo dài từ GuzzleHttpExceptionBadResponseException.
-* Một GuzzleHttpExceptionTooManyRedirectsException được ném khi có quá nhiều chuyển hướng được theo sau. Ngoại lệ này kéo dài từ GuzzleHttpExceptionRequestException.
+* Một GuzzleHttpExceptionServerException được ném cho 500 lỗi cấp nếu tùy chọn yêu cầu http_errors được đặt thành true. Ngoại lệ này kế thừa (extends) từ GuzzleHttpExceptionBadResponseException.
+* Một GuzzleHttpExceptionTooManyRedirectsException được ném khi có quá nhiều chuyển hướng được theo sau. Ngoại lệ này kế thừa (extends) từ GuzzleHttpExceptionRequestException.
 
 Tất cả các ngoại lệ trên đều kéo dài từ  `GuzzleHttpExceptionTransferException`.
 
@@ -446,7 +445,7 @@ Tất cả các ngoại lệ trên đều kéo dài từ  `GuzzleHttpExceptionTr
 Guzzle cho thấy một vài biến môi trường có thể được sử dụng để tùy chỉnh hành vi của thư viện.
 
 `GUZZLE_CURL_SELECT_TIMEOUT`
-: Kiểm soát thời lượng tính bằng giây mà một trình xử lý curl_multi_ * sẽ sử dụng khi chọn trên các handler curl bằng cách sử dụng curl_multi_select (). Một số hệ thống gặp sự cố với việc triển khai curl_multi_select () của PHP khi việc gọi chức năng này luôn dẫn đến việc chờ thời lượng chờ tối đa.
+: Kiểm soát thời lượng tính bằng giây mà một trình xử lý curl_multi_ * sẽ sử dụng khi chọn trên các handler curl bằng cách sử dụng curl_multi_select (). Một số hệ thống gặp sự cố với việc triển khai curl_multi_select () của PHP khi việc gọi chức năng này luôn dẫn đến việc phải chờ trong khoảng thời gian timeout tối đa.
 
 `HTTP_PROXY`
 : 
